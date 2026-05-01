@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="p-6">
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <!-- Header Section -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-4xl font-black text-slate-900 mb-2">👟 Step Analysis Hub</h1>
+                <p class="text-slate-500 text-sm">Track your daily movement and achieve your step goals</p>
+            </div>
+            <div class="text-right">
+                <p class="text-slate-400 text-xs uppercase tracking-widest">Daily Goal</p>
+                <p class="text-3xl font-black text-purple-600">{{ step_goal | int }}</p>
+            </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- Total Steps -->
+            <div class="glass-card border border-slate-200 rounded-2xl p-6 hover:border-purple-500/50 transition-all">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">Total Steps (30 Days)</p>
+                    <span class="text-2xl">📊</span>
+                </div>
+                <p class="text-3xl font-black text-slate-900">{{ total_steps | int }}</p>
+                <p class="text-slate-400 text-xs mt-2">{{ (total_steps / 30) | int | abs }} avg/day</p>
+            </div>
+
+            <!-- Average Steps -->
+            <div class="glass-card border border-slate-200 rounded-2xl p-6 hover:border-blue-500/50 transition-all">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">Daily Average</p>
+                    <span class="text-2xl">📈</span>
+                </div>
+                <p class="text-3xl font-black text-slate-900">{{ avg_steps | int }}</p>
+                <p class="text-slate-400 text-xs mt-2">
+                    {% if avg_steps >= step_goal %}
+                        ✅ Goal Exceeded
+                    {% else %}
+                        {{ step_goal - avg_steps }} steps to goal
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- Peak Steps -->
+            <div class="glass-card border border-slate-200 rounded-2xl p-6 hover:border-green-500/50 transition-all">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">Peak Day</p>
+                    <span class="text-2xl">🔥</span>
+                </div>
+                <p class="text-3xl font-black text-slate-900">{{ max_steps | int }}</p>
+                <p class="text-slate-400 text-xs mt-2">{{ ((max_steps / step_goal) * 100) | int }}% of goal</p>
+            </div>
+
+            <!-- Achievement Rate -->
+            <div class="glass-card border border-slate-200 rounded-2xl p-6 hover:border-yellow-500/50 transition-all">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">Goal Success Rate</p>
+                    <span class="text-2xl">🎯</span>
+                </div>
+                <p class="text-3xl font-black text-slate-900">{{ achievement_rate }}%</p>
+                <p class="text-slate-400 text-xs mt-2">{{ days_goal_met }} of {{ history | length }} days</p>
+            </div>
+        </div>
+
+        <!-- Goal Settings -->
+        <div class="glass-card border border-slate-200 rounded-2xl p-6">
+            <h2 class="text-xl font-black text-slate-900 mb-4">⚙️ Update Daily Step Goal</h2>
+            <div class="flex gap-4 items-end">
+                <div class="flex-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">New Daily Goal (steps)</label>
+                    <input type="number" id="newStepGoal" value="{{ step_goal }}" min="1000" step="500"
+                           class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:border-purple-500 transition-all outline-none">
+                </div>
+                <button onclick="updateStepGoal()" 
+                        class="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl font-black text-xs uppercase tracking-widest text-white hover:shadow-[0_10px_30px_rgba(147,51,234,0.2)] transition-all active:scale-95">
+                    Update Goal
+                </button>
+            </div>
+        </div>
+
+        <!-- 30-Day Chart -->
+        <div class="glass-card border border-slate-200 rounded-2xl p-6">
+            <h2 class="text-xl font-black text-slate-900 mb-6">📊 30-Day Step Tracking</h2>
+            <div class="overflow-x-auto">
+                <canvas id="stepsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Daily Breakdown Table -->
+        <div class="glass-card border border-slate-200 rounded-2xl p-6">
+            <h2 class="text-xl font-black text-slate-900 mb-4">📋 Daily Breakdown</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="border-b border-slate-200">
+                        <tr class="text-slate-500 text-xs font-bold uppercase tracking-widest">
+                            <td class="px-4 py-3">Date</td>
+                            <td class="px-4 py-3 text-right">Steps</td>
+                            <td class="px-4 py-3">Progress</td>
+                            <td class="px-4 py-3 text-center">Status</td>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for log in history %}
+                        <tr class="hover:bg-slate-50 transition-all">
+                            <td class="px-4 py-3 text-slate-900 font-bold">{{ log.date.strftime('%a, %b %d') }}</td>
+                            <td class="px-4 py-3 text-right text-slate-900 font-bold">
+                                {{ log.steps | int }}
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="w-full bg-slate-100 rounded-full h-2">
+                                    <div class="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all"
+                                         data-style="width: {{ [(log.steps / step_goal * 100), 100] | min }}%"></div>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                {% if log.steps >= step_goal %}
+                                    <span class="text-green-400 font-bold">✅ Goal</span>
+                                {% elif log.steps >= step_goal * 0.75 %}
+                                    <span class="text-yellow-400 font-bold">⚠️ Close</span>
+                                {% elif log.steps > 0 %}
+                                    <span class="text-blue-400 font-bold">📈 {{(log.steps / step_goal * 100) | int}}%</span>
+                                {% else %}
+                                    <span class="text-gray-500 font-bold">❌ No Data</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- AI Insights -->
+        <div class="glass-card border border-slate-200 rounded-2xl p-6 bg-gradient-to-br from-purple-50 to-blue-50">
+            <h2 class="text-xl font-black text-slate-900 mb-4">💡 AI Insights</h2>
+            <div class="space-y-3 text-slate-600 text-sm">
+                {% if achievement_rate >= 80 %}
+                    <p>🎉 <strong>Outstanding Performance!</strong> You're hitting your step goal {{ achievement_rate }}% of the time. Keep this momentum!</p>
+                {% elif achievement_rate >= 60 %}
+                    <p>👍 <strong>Good Consistency!</strong> You're on track with {{ achievement_rate }}% goal achievement. Challenge yourself to add 2-3% more!</p>
+                {% elif achievement_rate >= 40 %}
+                    <p>💪 <strong>Making Progress!</strong> Current rate: {{ achievement_rate }}%. Try adding 1-2 short walks daily to boost your average.</p>
+                {% else %}
+                    <p>🚀 <strong>Time to Step Up!</strong> Your current achievement rate is {{ achievement_rate }}%. Consider setting a reminder to move every hour.</p>
+                {% endif %}
+                
+                <p class="mt-4">📊 <strong>Weekly Trend:</strong> Your average is {{ avg_steps | int }} steps/day. 
+                {% if avg_steps > step_goal %}
+                    You're exceeding your goal! Consider increasing it to {{ (step_goal * 1.1) | int }} steps.
+                {% endif %}
+                </p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Initialize step chart
+    const ctx = document.getElementById('stepsChart').getContext('2d');
+    const labels = JSON.parse('{{ chart_labels | tojson | safe }}');
+    const stepsData = JSON.parse('{{ chart_steps | tojson | safe }}');
+    const stepGoal = Number('{{ step_goal }}');
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Daily Steps',
+                    data: stepsData,
+                    backgroundColor: stepsData.map(val => val >= stepGoal ? 'rgba(34, 197, 94, 0.6)' : 'rgba(139, 92, 246, 0.6)'),
+                    borderColor: stepsData.map(val => val >= stepGoal ? 'rgba(34, 197, 94, 1)' : 'rgba(139, 92, 246, 1)'),
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    tension: 0.4
+                },
+                {
+                    label: 'Daily Goal',
+                    data: Array(labels.length).fill(stepGoal),
+                    type: 'line',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 3,
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        font: { weight: 'bold' }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: 'rgba(255, 255, 255, 0.5)' },
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                },
+                x: {
+                    ticks: { color: 'rgba(255, 255, 255, 0.5)' },
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                }
+            }
+        }
+    });
+
+    function updateStepGoal() {
+        const newGoal = document.getElementById('newStepGoal').value;
+        
+        fetch('/update_step_goal', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ goal: newGoal })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Step goal updated to ' + newGoal + ' steps!');
+                location.reload();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-style]').forEach(el => el.setAttribute('style', el.getAttribute('data-style')));
+    });
+</script>
+{% endblock %}

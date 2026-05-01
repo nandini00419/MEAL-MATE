@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .vital-card {
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    }
+
+    .vital-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05)
+    }
+
+    .input-light {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        color: #1e293b;
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-size: 0.875rem;
+        outline: none;
+        transition: border 0.3s
+    }
+
+    .input-light:focus {
+        border-color: rgba(16, 185, 129, 0.5)
+    }
+
+    .ai-badge {
+        background: linear-gradient(135deg, #7c3aed, #4f46e5);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+</style>
+
+<section class="space-y-6">
+    <header class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between fade-up">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900">🫀 Health Monitor</h1>
+            <p class="text-slate-500 text-sm">Track your vital signs and get AI health analysis</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ url_for('dashboard') }}"
+                class="glass-card rounded-xl px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white transition">←
+                Dashboard</a>
+            <button onclick="generateWellnessReport()"
+                class="rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 px-4 py-2 text-sm font-bold text-white hover:shadow-lg hover:shadow-violet-500/20 transition">🧠
+                AI Wellness Report</button>
+        </div>
+    </header>
+
+    <!-- Vitals Input Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 fade-up" style="animation-delay:.05s">
+        <!-- Heart Rate -->
+        <div class="glass-card vital-card rounded-3xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="h-10 w-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-lg pulse-anim">
+                        ❤️</div>
+                    <div>
+                        <p class="text-sm font-bold text-slate-900">Heart Rate</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Beats per minute</p>
+                    </div>
+                </div>
+                <p class="text-3xl font-black text-rose-500" id="hrDisplay">{{ log.heart_rate or '--' }}</p>
+            </div>
+            <div class="flex gap-2">
+                <input type="number" id="hrInput" placeholder="72" class="input-light w-full" min="40" max="200">
+                <button onclick="saveVital('heart_rate','hrInput','hrDisplay')"
+                    class="rounded-xl bg-rose-500/10 border border-rose-500/20 px-4 py-2 text-sm font-bold text-rose-600 hover:bg-rose-500/20 transition">Save</button>
+            </div>
+            <p
+                class="text-xs mt-2 {{ 'text-emerald-600' if log.heart_rate and 60 <= log.heart_rate <= 100 else 'text-amber-600' if log.heart_rate else 'text-slate-400' }}">
+                {% if log.heart_rate %}{% if 60 <= log.heart_rate <=100 %}✓ Normal range{% elif log.heart_rate < 60 %}⚠
+                    Below normal{% else %}⚠ Elevated{% endif %}{% else %}Enter your resting heart rate{% endif %} </p>
+        </div>
+
+        <!-- Blood Pressure -->
+        <div class="glass-card vital-card rounded-3xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="h-10 w-10 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center text-lg">
+                        🩺</div>
+                    <div>
+                        <p class="text-sm font-bold text-slate-900">Blood Pressure</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Systolic / Diastolic</p>
+                    </div>
+                </div>
+                <p class="text-2xl font-black text-violet-600" id="bpDisplay">{{ log.blood_pressure_sys or '--' }}/{{
+                    log.blood_pressure_dia or '--' }}</p>
+            </div>
+            <div class="flex gap-2">
+                <input type="number" id="bpSysInput" placeholder="120" class="input-light w-1/2" min="80" max="200">
+                <input type="number" id="bpDiaInput" placeholder="80" class="input-light w-1/2" min="40" max="130">
+                <button onclick="saveBP()"
+                    class="rounded-xl bg-violet-500/10 border border-violet-500/20 px-4 py-2 text-sm font-bold text-violet-600 hover:bg-violet-500/20 transition">Save</button>
+            </div>
+            <p
+                class="text-xs mt-2 {% if log.blood_pressure_sys and log.blood_pressure_sys <= 120 and log.blood_pressure_dia <= 80 %}text-emerald-600{% elif log.blood_pressure_sys %}text-amber-600{% else %}text-slate-400{% endif %}">
+                {% if log.blood_pressure_sys %}{% if log.blood_pressure_sys <= 120 and log.blood_pressure_dia <=80 %}✓
+                    Normal{% elif log.blood_pressure_sys <=140 %}⚠ Elevated{% else %}⚠ High{% endif %}{% else %}Enter
+                    your blood pressure{% endif %} </p>
+        </div>
+
+        <!-- Blood Oxygen -->
+        <div class="glass-card vital-card rounded-3xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="h-10 w-10 rounded-xl bg-cyan-50 border border-cyan-100 flex items-center justify-center text-lg">
+                        🫁</div>
+                    <div>
+                        <p class="text-sm font-bold text-slate-900">Blood Oxygen</p>
+                        <p class="text-[10px] text-slate-500 uppercase">SpO₂ Saturation</p>
+                    </div>
+                </div>
+                <p class="text-3xl font-black text-cyan-600" id="spo2Display">{{ log.blood_oxygen or '--' }}<span
+                        class="text-sm text-slate-500">%</span></p>
+            </div>
+            <div class="flex gap-2">
+                <input type="number" id="spo2Input" placeholder="98" class="input-light w-full" min="70" max="100">
+                <button onclick="saveVital('blood_oxygen','spo2Input','spo2Display')"
+                    class="rounded-xl bg-cyan-500/10 border border-cyan-500/20 px-4 py-2 text-sm font-bold text-cyan-600 hover:bg-cyan-500/20 transition">Save</button>
+            </div>
+            <p
+                class="text-xs mt-2 {% if log.blood_oxygen and log.blood_oxygen >= 95 %}text-emerald-600{% elif log.blood_oxygen %}text-rose-600{% else %}text-slate-400{% endif %}">
+                {% if log.blood_oxygen %}{% if log.blood_oxygen >= 95 %}✓ Healthy level{% else %}⚠ Low — consult doctor{% endif %}{% else %}Enter SpO₂ reading{% endif %}
+            </p>
+        </div>
+
+        <!-- Temperature -->
+        <div class="glass-card vital-card rounded-3xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="h-10 w-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-lg">
+                        🌡️</div>
+                    <div>
+                        <p class="text-sm font-bold text-slate-900">Temperature</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Body temp (°C)</p>
+                    </div>
+                </div>
+                <p class="text-3xl font-black text-amber-600" id="tempDisplay">{{ log.body_temperature or '--' }}<span
+                        class="text-sm text-slate-500">°C</span></p>
+            </div>
+            <div class="flex gap-2">
+                <input type="number" id="tempInput" placeholder="36.6" class="input-light w-full" step="0.1" min="35"
+                    max="42">
+                <button onclick="saveVital('body_temperature','tempInput','tempDisplay')"
+                    class="rounded-xl bg-amber-500/10 border border-amber-500/20 px-4 py-2 text-sm font-bold text-amber-600 hover:bg-amber-500/20 transition">Save</button>
+            </div>
+        </div>
+
+        <!-- Sleep -->
+        <div class="glass-card vital-card rounded-3xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="h-10 w-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-lg">
+                        😴</div>
+                    <div>
+                        <p class="text-sm font-bold text-slate-900">Sleep</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Hours last night</p>
+                    </div>
+                </div>
+                <p class="text-3xl font-black text-indigo-600" id="sleepDisplay">{{ log.sleep_hours or '--' }}<span
+                        class="text-sm text-slate-500">h</span></p>
+            </div>
+            <div class="flex gap-2">
+                <input type="number" id="sleepInput" placeholder="7.5" class="input-light w-full" step="0.5" min="0"
+                    max="24">
+                <button onclick="saveVital('sleep','sleepInput','sleepDisplay')"
+                    class="rounded-xl bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 text-sm font-bold text-indigo-600 hover:bg-indigo-500/20 transition">Save</button>
+            </div>
+        </div>
+
+        <!-- Steps -->
+        <div class="glass-card vital-card rounded-3xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="h-10 w-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-lg">
+                        👣</div>
+                    <div>
+                        <p class="text-sm font-bold text-slate-900">Steps</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Daily step count</p>
+                    </div>
+                </div>
+                <p class="text-3xl font-black text-emerald-600" id="stepsDisplay">{{ log.steps or 0 }}</p>
+            </div>
+            <div class="flex gap-2">
+                <input type="number" id="stepsInput" placeholder="5000" class="input-light w-full" min="0" max="100000">
+                <button onclick="saveVital('steps','stepsInput','stepsDisplay')"
+                    class="rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 text-sm font-bold text-emerald-600 hover:bg-emerald-500/20 transition">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Wellness Report -->
+    <div class="glass-card ai-section rounded-3xl p-6 fade-up" style="animation-delay:.15s" id="wellnessReportSection">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold text-slate-900">🧠 AI Comprehensive Wellness Report</h3>
+            <span class="ai-badge">AI Analysis</span>
+        </div>
+        <p class="text-xs text-slate-500 mb-4">AI analyzes all your vitals, nutrition, and activity to produce a
+            holistic health assessment.</p>
+        <div id="wellnessReportArea"
+            class="ai-content-area max-h-[500px] overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-5">
+            {% if user.wellness_report %}
+            {{ user.wellness_report | safe }}
+            {% else %}
+            <div class="text-center py-10">
+                <p class="text-4xl mb-3">🔬</p>
+                <p class="text-slate-500">Log your vitals above, then click <strong class="text-emerald-600">"AI
+                        Wellness Report"</strong> to get a comprehensive health analysis.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- BMI Card -->
+    <div class="glass-card rounded-3xl p-6 fade-up" style="animation-delay:.2s">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-lg font-bold text-slate-900">📐 Body Mass Index</h3>
+                <p class="text-xs text-slate-500">Based on your profile data</p>
+            </div>
+            <div class="text-right">
+                <p
+                    class="text-4xl font-black {% if bmi and bmi < 25 %}text-emerald-400{% elif bmi and bmi < 30 %}text-amber-400{% elif bmi %}text-rose-400{% else %}text-slate-500{% endif %}">
+                    {% if bmi %}{{ bmi }}{% else %}--{% endif %}
+                </p>
+                <p
+                    class="text-xs font-semibold {% if bmi_status == 'Healthy' %}text-emerald-400{% elif bmi_status == 'N/A' %}text-slate-500{% else %}text-amber-400{% endif %}">
+                    {{ bmi_status }}</p>
+            </div>
+        </div>
+        {% if bmi %}
+        <div class="mt-4 h-3 rounded-full bg-slate-100 overflow-hidden relative">
+            {% set bmi_width = [bmi/40*100, 100] | min %}
+            <div class="absolute inset-y-0 left-0 rounded-full"
+                data-style="width:{{ bmi_width }}%; background: linear-gradient(90deg, #10b981 0%, #f59e0b 50%, #f43f5e 100%);">
+            </div>
+        </div>
+        <div class="flex justify-between text-[9px] text-slate-600 mt-1">
+            <span>Underweight</span><span>Normal</span><span>Overweight</span><span>Obese</span>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+    async function saveVital(field, inputId, displayId) {
+        const v = document.getElementById(inputId).value; if (!v) return;
+        const r = await fetch('/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ field, value: parseFloat(v) }) });
+        const d = await r.json();
+        if (d.success) {
+            const el = document.getElementById(displayId);
+            if (field === 'body_temperature') el.innerHTML = v + '<span class="text-sm text-slate-500">°C</span>';
+            else if (field === 'blood_oxygen') el.innerHTML = v + '<span class="text-sm text-slate-500">%</span>';
+            else if (field === 'sleep') el.innerHTML = v + '<span class="text-sm text-slate-500">h</span>';
+            else el.innerText = v;
+            document.getElementById(inputId).value = '';
+        }
+    }
+
+    async function saveBP() {
+        const sys = document.getElementById('bpSysInput').value, dia = document.getElementById('bpDiaInput').value;
+        if (!sys || !dia) return;
+        const r = await fetch('/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ field: 'blood_pressure', value: { sys: parseInt(sys), dia: parseInt(dia) } }) });
+        const d = await r.json();
+        if (d.success) { document.getElementById('bpDisplay').innerText = sys + '/' + dia; document.getElementById('bpSysInput').value = ''; document.getElementById('bpDiaInput').value = ''; }
+    }
+
+    async function generateWellnessReport() {
+        const area = document.getElementById('wellnessReportArea');
+        area.innerHTML = '<div class="text-center py-8"><div class="inline-block h-8 w-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mb-3"></div><p class="text-slate-400">AI is analyzing your complete health profile...</p><p class="text-xs text-slate-600 mt-1">This may take 15-30 seconds</p></div>';
+        try {
+            const r = await fetch('/wellness_report'); const d = await r.json();
+            area.innerHTML = d.html;
+            document.querySelectorAll('[data-style]').forEach(el => el.setAttribute('style', el.getAttribute('data-style')));
+        } catch (e) { area.innerHTML = '<p class="text-rose-400">Error generating report. Try again.</p>'; }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-style]').forEach(el => el.setAttribute('style', el.getAttribute('data-style')));
+    });
+</script>
+{% endblock %}

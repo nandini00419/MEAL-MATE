@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .hero-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.4;
+        animation: float 8s ease-in-out infinite alternate;
+    }
+    @keyframes float {
+        0% { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(30px, -20px) scale(1.1); }
+    }
+    .feature-icon {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.1));
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .stat-card {
+        background: white;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+    .cta-gradient {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(139, 92, 246, 0.05));
+        border: 1px solid rgba(16, 185, 129, 0.1);
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="relative mx-auto max-w-7xl px-4 py-16 md:py-24 overflow-hidden">
+    <!-- Animated orbs -->
+    <div class="hero-orb w-72 h-72 bg-emerald-500/30 top-0 -left-20" style="animation-delay: 0s;"></div>
+    <div class="hero-orb w-96 h-96 bg-violet-500/20 -top-10 right-0" style="animation-delay: 2s;"></div>
+    <div class="hero-orb w-64 h-64 bg-cyan-500/20 bottom-0 left-1/3" style="animation-delay: 4s;"></div>
+
+    <div class="relative z-10 grid items-center gap-12 md:grid-cols-2">
+        <div class="fade-up">
+            <div class="mb-6 inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-100 px-4 py-1.5">
+                <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">AI-Powered Health Intelligence</span>
+            </div>
+            <h1 class="mb-6 text-5xl font-black leading-tight md:text-7xl">
+                <span class="text-slate-900">Your Health,</span><br>
+                <span class="gradient-text">Reimagined by AI</span>
+            </h1>
+            <p class="mb-8 text-lg text-slate-500 leading-relaxed max-w-lg">
+                Track vitals in real-time, get AI-personalized meal plans, monitor heart health, and receive predictive health insights — all in one stunning platform.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <a href="{{ url_for('register') }}" class="group rounded-2xl bg-gradient-to-r from-emerald-600 to-cyan-600 px-8 py-4 font-bold text-white transition-all hover:shadow-xl hover:shadow-emerald-500/25 hover:scale-[1.02] active:scale-[0.98]">
+                    Start Free Today
+                    <span class="ml-2 group-hover:ml-3 transition-all">→</span>
+                </a>
+                <a href="{{ url_for('login') }}" class="rounded-2xl border border-slate-200 px-8 py-4 font-semibold text-slate-600 transition-all hover:bg-slate-50 hover:border-slate-300">
+                    Sign In
+                </a>
+            </div>
+            <div class="mt-8 flex items-center gap-6">
+                <div class="flex -space-x-2">
+                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 border-2 border-white flex items-center justify-center text-[10px] font-bold text-white">A</div>
+                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-violet-400 to-pink-400 border-2 border-white flex items-center justify-center text-[10px] font-bold text-white">S</div>
+                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-400 border-2 border-white flex items-center justify-center text-[10px] font-bold text-white">R</div>
+                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-rose-400 to-red-400 border-2 border-white flex items-center justify-center text-[10px] font-bold text-white">+</div>
+                </div>
+                <p class="text-sm text-slate-400">Trusted by <span class="text-slate-900 font-semibold">45,000+</span> health-conscious users</p>
+            </div>
+        </div>
+
+        <!-- Dashboard Preview Card -->
+        <div class="fade-up relative" style="animation-delay: 0.2s;">
+            <div class="glass-card rounded-3xl p-6 space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-500 uppercase tracking-wider">Today's Health Score</p>
+                        <p class="text-4xl font-black text-slate-900 mt-1">87<span class="text-lg text-slate-500">/100</span></p>
+                    </div>
+                    <div class="h-14 w-14 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-2xl">💚</div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="rounded-xl bg-emerald-50 border border-emerald-100 p-3 text-center">
+                        <p class="text-lg font-bold text-emerald-600">72</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Heart BPM</p>
+                    </div>
+                    <div class="rounded-xl bg-cyan-50 border border-cyan-100 p-3 text-center">
+                        <p class="text-lg font-bold text-cyan-600">98%</p>
+                        <p class="text-[10px] text-slate-500 uppercase">SpO₂</p>
+                    </div>
+                    <div class="rounded-xl bg-violet-50 border border-violet-100 p-3 text-center">
+                        <p class="text-lg font-bold text-violet-600">7.5h</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Sleep</p>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-slate-500">Calories</span>
+                        <span class="text-emerald-600 font-semibold">1,450 / 2,100 kcal</span>
+                    </div>
+                    <div class="h-2 rounded-full bg-slate-100 overflow-hidden">
+                        <div class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-400" style="width: 69%"></div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 rounded-xl bg-amber-50 border border-amber-100 p-3">
+                    <span class="text-amber-500">⚡</span>
+                    <p class="text-xs text-amber-700">AI Insight: Add 25g protein at dinner for optimal recovery</p>
+                </div>
+            </div>
+            <!-- Floating badges -->
+            <div class="absolute -top-3 -right-3 rounded-xl bg-gradient-to-br from-violet-600 to-purple-700 px-3 py-1.5 text-xs font-bold text-white shadow-lg shadow-violet-500/30 animate-bounce" style="animation-duration: 3s;">
+                🧠 AI Powered
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Bar -->
+<section class="mx-auto max-w-7xl px-4 py-8">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 fade-up" style="animation-delay: 0.3s;">
+        <div class="stat-card rounded-2xl p-5 text-center backdrop-blur-sm">
+            <p class="text-3xl font-black gradient-text">15+</p>
+            <p class="text-xs text-slate-500 mt-1">Health Metrics Tracked</p>
+        </div>
+        <div class="stat-card rounded-2xl p-5 text-center backdrop-blur-sm">
+            <p class="text-3xl font-black gradient-text">24/7</p>
+            <p class="text-xs text-slate-500 mt-1">AI Health Monitoring</p>
+        </div>
+        <div class="stat-card rounded-2xl p-5 text-center backdrop-blur-sm">
+            <p class="text-3xl font-black gradient-text">30-Day</p>
+            <p class="text-xs text-slate-500 mt-1">Predictive Forecasts</p>
+        </div>
+        <div class="stat-card rounded-2xl p-5 text-center backdrop-blur-sm">
+            <p class="text-3xl font-black gradient-text">100%</p>
+            <p class="text-xs text-slate-500 mt-1">Personalized Plans</p>
+        </div>
+    </div>
+</section>
+
+<!-- Features Grid -->
+<section class="mx-auto max-w-7xl px-4 py-12 md:py-20">
+    <div class="text-center mb-14 fade-up" style="animation-delay: 0.1s;">
+        <p class="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-3">Everything You Need</p>
+        <h2 class="text-4xl font-black text-slate-900">Health + Nutrition, <span class="gradient-text">Unified</span></h2>
+        <p class="text-slate-500 mt-3 max-w-xl mx-auto">Two powerful AI systems working together to give you the most comprehensive health platform ever built.</p>
+    </div>
+    <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div class="glass-card rounded-3xl p-7 fade-up" style="animation-delay: 0.15s;">
+            <div class="feature-icon h-12 w-12 rounded-2xl flex items-center justify-center text-xl mb-4">❤️</div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">Real-Time Vital Signs</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">Track heart rate, blood pressure, SpO₂, temperature — AI detects anomalies before they become problems.</p>
+        </div>
+        <div class="glass-card rounded-3xl p-7 fade-up" style="animation-delay: 0.2s;">
+            <div class="feature-icon h-12 w-12 rounded-2xl flex items-center justify-center text-xl mb-4">🧬</div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">AI Meal Engineering</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">Personalized 7-day meal plans with macro optimization based on your body metrics and health goals.</p>
+        </div>
+        <div class="glass-card rounded-3xl p-7 fade-up" style="animation-delay: 0.25s;">
+            <div class="feature-icon h-12 w-12 rounded-2xl flex items-center justify-center text-xl mb-4">📊</div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">Predictive Analytics</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">30-day health forecasts using AI pattern recognition — know what's coming before it happens.</p>
+        </div>
+        <div class="glass-card rounded-3xl p-7 fade-up" style="animation-delay: 0.3s;">
+            <div class="feature-icon h-12 w-12 rounded-2xl flex items-center justify-center text-xl mb-4">🏃</div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">Fitness Intelligence</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">Steps, exercise minutes, calories burned — your AI personal trainer that adapts to your pace.</p>
+        </div>
+        <div class="glass-card rounded-3xl p-7 fade-up" style="animation-delay: 0.35s;">
+            <div class="feature-icon h-12 w-12 rounded-2xl flex items-center justify-center text-xl mb-4">🧠</div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">Mental Wellness</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">Track mood, stress levels, sleep quality — because mental health is health. AI mood pattern analysis.</p>
+        </div>
+        <div class="glass-card rounded-3xl p-7 fade-up" style="animation-delay: 0.4s;">
+            <div class="feature-icon h-12 w-12 rounded-2xl flex items-center justify-center text-xl mb-4">👨‍🍳</div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">AI Chef & Nutritionist</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">Ask any nutrition question, get cooking guides, analyze ingredients — your 24/7 health companion.</p>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="mx-auto max-w-7xl px-4 py-12">
+    <div class="cta-gradient rounded-3xl p-10 md:p-16 backdrop-blur-sm fade-up" style="animation-delay: 0.2s;">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-black text-slate-900">Three Steps to Total Wellness</h2>
+        </div>
+        <div class="grid gap-8 md:grid-cols-3">
+            <div class="text-center">
+                <div class="mx-auto mb-4 h-14 w-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-xl font-black text-white shadow-lg shadow-emerald-500/20">1</div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Build Your Profile</h3>
+                <p class="text-sm text-slate-500">Enter your biometrics, goals, dietary preferences — AI creates your digital health twin.</p>
+            </div>
+            <div class="text-center">
+                <div class="mx-auto mb-4 h-14 w-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center text-xl font-black text-white shadow-lg shadow-cyan-500/20">2</div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Track & Monitor</h3>
+                <p class="text-sm text-slate-500">Log meals, vitals, exercise, sleep — the AI learns and adapts to your unique patterns.</p>
+            </div>
+            <div class="text-center">
+                <div class="mx-auto mb-4 h-14 w-14 rounded-2xl bg-gradient-to-br from-violet-500 to-violet-600 flex items-center justify-center text-xl font-black text-white shadow-lg shadow-violet-500/20">3</div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Get AI Insights</h3>
+                <p class="text-sm text-slate-500">Receive meal plans, health predictions, alerts, and actionable recommendations daily.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="mx-auto max-w-7xl px-4 py-12">
+    <h2 class="text-center text-3xl font-black text-slate-900 mb-10 fade-up">What Users Are Saying</h2>
+    <div class="grid gap-5 md:grid-cols-3 fade-up" style="animation-delay: 0.15s;">
+        <div class="glass-card rounded-3xl p-6">
+            <div class="flex items-center gap-1 mb-3">
+                <span class="text-amber-400">★★★★★</span>
+            </div>
+            <p class="text-sm text-slate-500 mb-4 leading-relaxed">"The health monitoring combined with meal planning is genius. My blood pressure improved in just 3 weeks!"</p>
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-8 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center text-xs font-bold text-white">P</div>
+                <div>
+                    <p class="text-sm font-semibold text-slate-900">Priya S.</p>
+                    <p class="text-xs text-slate-500">Lost 8kg in 2 months</p>
+                </div>
+            </div>
+        </div>
+        <div class="glass-card rounded-3xl p-6">
+            <div class="flex items-center gap-1 mb-3">
+                <span class="text-amber-400">★★★★★</span>
+            </div>
+            <p class="text-sm text-slate-500 mb-4 leading-relaxed">"Finally an app that understands Indian food! The AI meal plans fit perfectly with my vegetarian lifestyle."</p>
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-8 rounded-full bg-gradient-to-br from-violet-400 to-pink-400 flex items-center justify-center text-xs font-bold text-white">R</div>
+                <div>
+                    <p class="text-sm font-semibold text-slate-900">Rahul M.</p>
+                    <p class="text-xs text-slate-500">Health score: 92/100</p>
+                </div>
+            </div>
+        </div>
+        <div class="glass-card rounded-3xl p-6">
+            <div class="flex items-center gap-1 mb-3">
+                <span class="text-amber-400">★★★★★</span>
+            </div>
+            <p class="text-sm text-slate-500 mb-4 leading-relaxed">"The AI predicted I was overtraining before I even felt it. Game-changer for my fitness journey!"</p>
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center text-xs font-bold text-white">A</div>
+                <div>
+                    <p class="text-sm font-semibold text-slate-900">Ananya K.</p>
+                    <p class="text-xs text-slate-500">Marathon runner</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="mx-auto max-w-7xl px-4 py-12 mb-8">
+    <div class="rounded-3xl bg-gradient-to-r from-emerald-50 via-cyan-50 to-violet-50 border border-emerald-100 p-12 text-center backdrop-blur-sm fade-up" style="animation-delay: 0.1s;">
+        <h2 class="text-4xl font-black text-slate-900 mb-4">Start Your Health Revolution</h2>
+        <p class="text-slate-500 mb-8 max-w-lg mx-auto">Join thousands who've transformed their health with AI-powered insights. Free to start, incredible to experience.</p>
+        <a href="{{ url_for('register') }}" class="inline-block rounded-2xl bg-gradient-to-r from-emerald-600 to-cyan-600 px-10 py-4 font-bold text-white transition-all hover:shadow-xl hover:shadow-emerald-500/25 hover:scale-[1.02]">
+            Create Free Account →
+        </a>
+    </div>
+</section>
+{% endblock %}
