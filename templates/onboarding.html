@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="min-h-center flex items-center justify-center py-12">
+    <div class="glass-panel max-w-2xl w-full p-10 rounded-[3rem] relative overflow-hidden border border-white/5">
+        <div class="absolute -top-20 -left-20 w-60 h-60 bg-blue-600/10 blur-[100px] rounded-full"></div>
+        <div class="absolute -bottom-20 -right-20 w-60 h-60 bg-purple-600/10 blur-[100px] rounded-full"></div>
+        
+        <div class="relative z-10">
+            <h2 class="text-4xl font-black text-white mb-2">Build Your Health Twin</h2>
+            <p class="text-gray-400 mb-10 text-sm tracking-wide">Our Agentic AI will construct a 30-day biological simulation and personalized nutrition protocol based on your DNA profile (simulated).</p>
+            
+            <form method="POST" action="" onsubmit="showLoader()" class="space-y-6">
+                <!-- Physical Profile Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Biological Age</label>
+                        <input type="number" name="age" required placeholder="25"
+                               class="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white focus:border-purple-500 transition-all outline-none">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Gender identity</label>
+                        <select name="gender" class="w-full px-6 py-4 bg-[#0f172a] border border-white/10 rounded-2xl text-white focus:border-purple-500 transition-all outline-none">
+                            <option>Male</option><option>Female</option><option>Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Height (cm)</label>
+                        <input type="number" name="height" required placeholder="185"
+                               class="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white focus:border-purple-500 transition-all outline-none">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Current Mass (kg)</label>
+                        <input type="number" step="0.1" name="weight" required placeholder="80.5"
+                               class="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white focus:border-purple-500 transition-all outline-none">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Target Mass (kg)</label>
+                        <input type="number" step="0.1" name="target_weight" required placeholder="75.0"
+                               class="w-full px-6 py-4 bg-white/5 border border-white/20 rounded-2xl text-white outline-none focus:border-blue-500 transition-all">
+                    </div>
+                </div>
+
+                <!-- Strategic Goals -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Primary Objective</label>
+                        <select name="goal" class="w-full px-6 py-4 bg-[#0f172a] border border-white/10 rounded-2xl text-white focus:border-purple-500 transition-all outline-none">
+                            <option>Weight Loss</option>
+                            <option>Muscle Gain</option>
+                            <option>Maintenance</option>
+                            <option>Athletic Performance</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Activity Protocol</label>
+                        <select name="activity_level" class="w-full px-6 py-4 bg-[#0f172a] border border-white/10 rounded-2xl text-white focus:border-purple-500 transition-all outline-none">
+                            <option>Sedentary</option>
+                            <option>Lightly Active</option>
+                            <option>Moderately Active</option>
+                            <option>Very Active</option>
+                            <option>Extra Active</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Diet & Constraints -->
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Dietary Paradigm</label>
+                    <select name="preferences" class="w-full px-6 py-4 bg-[#0f172a] border border-white/10 rounded-2xl text-white focus:border-purple-500 transition-all outline-none">
+                        <option>No Restrictions</option>
+                        <option>Vegetarian</option>
+                        <option>Vegan (Plant-Based)</option>
+                        <option>Keto (High Fat/Low Carb)</option>
+                        <option>Paleo</option>
+                        <option>High Protein</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Biological Constraints (Allergies)</label>
+                    <input type="text" name="allergies" placeholder="e.g. Shellfish, Nuts, Lactose"
+                           class="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white focus:border-purple-500 transition-all outline-none">
+                </div>
+
+                <button type="submit" id="submit-btn" 
+                        class="w-full py-5 bg-gradient-to-r from-purple-600 to-blue-600 rounded-[2rem] font-black text-xs uppercase tracking-[0.4em] text-white hover:shadow-[0_10px_30px_rgba(147,51,234,0.4)] transition-all flex items-center justify-center gap-3 active:scale-95">
+                    <span id="btn-text">Initialize AI Engine</span>
+                    <span id="btn-icon">→</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showLoader() {
+        const btn = document.getElementById('submit-btn');
+        const span = document.getElementById('btn-text');
+        const icon = document.getElementById('btn-icon');
+        span.innerHTML = 'Analyzing Biometrics';
+        icon.innerHTML = '<svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+        btn.classList.add('opacity-80', 'cursor-not-allowed');
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="min-h-center flex items-center justify-center py-12">
+    <div class="glass-panel max-w-2xl w-full p-10 rounded-[3rem] relative overflow-hidden border border-white/5">
+        <div class="absolute -top-20 -left-20 w-60 h-60 bg-blue-600/10 blur-[100px] rounded-full"></div>
+        <div class="absolute -bottom-20 -right-20 w-60 h-60 bg-purple-600/10 blur-[100px] rounded-full"></div>
+        
+        <div class="relative z-10">
+            <h2 class="text-4xl font-black text-white mb-2">🏥 Deep Health Assessment</h2>
+            <p class="text-gray-400 mb-10 text-sm tracking-wide">Help us understand your complete health profile to create your personalized AI wellness plan.</p>
+            
+            <form method="POST" action="" class="space-y-6">
+                <!-- Health History Section -->
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4">📋 Health History</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Family History of Health Conditions</label>
+                            <textarea name="family_history" placeholder="e.g., Diabetes, Heart Disease, Hypertension..." rows="3"
+                                      class="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 transition-all outline-none"></textarea>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Past Surgeries or Treatments</label>
+                            <textarea name="past_surgeries" placeholder="List any major surgeries or medical treatments..." rows="3"
+                                      class="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 transition-all outline-none"></textarea>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Sleep Quality</label>
+                                <select name="sleep_quality" class="w-full px-6 py-4 bg-[#0f172a] border border-white/10 rounded-xl text-white focus:border-purple-500 transition-all outline-none">
+                                    <option value="">Select...</option>
+                                    <option>Poor</option>
+                                    <option>Fair</option>
+                                    <option>Good</option>
+                                    <option>Excellent</option>
+                                </select>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Current Stress Level</label>
+                                <select name="stress_level" class="w-full px-6 py-4 bg-[#0f172a] border border-white/10 rounded-xl text-white focus:border-purple-500 transition-all outline-none">
+                                    <option value="">Select...</option>
+                                    <option>Low</option>
+                                    <option>Moderate</option>
+                                    <option>High</option>
+                                    <option>Very High</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fitness Section -->
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4">🏋️ Fitness Profile</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Exercise Frequency</label>
+                            <select name="exercise_frequency" class="w-full px-6 py-4 bg-[#0f172a] border border-white/10 rounded-xl text-white focus:border-purple-500 transition-all outline-none">
+                                <option value="">Select...</option>
+                                <option>Never</option>
+                                <option>Rarely (1-2x/month)</option>
+                                <option>1-3x per week</option>
+                                <option>4-5x per week</option>
+                                <option>Daily</option>
+                            </select>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Preferred Exercises</label>
+                            <textarea name="preferred_exercises" placeholder="e.g., Running, Yoga, Weight Training, Swimming..." rows="2"
+                                      class="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 transition-all outline-none"></textarea>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Past Injuries (if any)</label>
+                            <textarea name="past_injuries" placeholder="List any past injuries affecting exercise..." rows="2"
+                                      class="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 transition-all outline-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dietary Section -->
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4">🍽️ Dietary Preferences</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Diet Type</label>
+                                <select name="diet_type" class="w-full px-6 py-4 bg-[#0f172a] border border-white/10 rounded-xl text-white focus:border-purple-500 transition-all outline-none">
+                                    <option value="">Select...</option>
+                                    <option>Omnivore</option>
+                                    <option>Vegetarian</option>
+                                    <option>Vegan</option>
+                                    <option>Keto</option>
+                                    <option>Paleo</option>
+                                    <option>Mediterranean</option>
+                                </select>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Cooking Skill Level</label>
+                                <select name="cooking_skill" class="w-full px-6 py-4 bg-[#0f172a] border border-white/10 rounded-xl text-white focus:border-purple-500 transition-all outline-none">
+                                    <option value="">Select...</option>
+                                    <option>Beginner</option>
+                                    <option>Intermediate</option>
+                                    <option>Advanced</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Meals Per Day</label>
+                            <select name="meals_per_day" class="w-full px-6 py-4 bg-[#0f172a] border border-white/10 rounded-xl text-white focus:border-purple-500 transition-all outline-none">
+                                <option value="">Select...</option>
+                                <option value="2">2 meals</option>
+                                <option value="3">3 meals</option>
+                                <option value="4">4 meals</option>
+                                <option value="5">5+ meals</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mental Health Section -->
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4">🧠 Mental Wellness</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Mental Health Concerns</label>
+                            <textarea name="mental_health_concerns" placeholder="Any anxiety, depression, or other concerns?" rows="3"
+                                      class="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 transition-all outline-none"></textarea>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Anxiety Level</label>
+                            <select name="anxiety_level" class="w-full px-6 py-4 bg-[#0f172a] border border-white/10 rounded-xl text-white focus:border-purple-500 transition-all outline-none">
+                                <option value="">Select...</option>
+                                <option>None</option>
+                                <option>Mild</option>
+                                <option>Moderate</option>
+                                <option>Severe</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Goals Section -->
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4">🎯 Health Goals</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Primary Health Goal</label>
+                            <input type="text" name="primary_health_goal" placeholder="e.g., Lose 10kg, Build Muscle, Improve Energy..."
+                                   class="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 transition-all outline-none">
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Secondary Goals</label>
+                            <textarea name="secondary_goals" placeholder="List any other health or fitness goals..." rows="2"
+                                      class="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:border-purple-500 transition-all outline-none"></textarea>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Motivation Level (1-10)</label>
+                            <input type="range" name="motivation_level" min="1" max="10" value="7" 
+                                   class="w-full cursor-pointer">
+                            <p class="text-gray-400 text-xs">Current: <span id="motivation-value">7</span>/10</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" 
+                        class="w-full py-5 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl font-black text-xs uppercase tracking-[0.4em] text-white hover:shadow-[0_10px_30px_rgba(147,51,234,0.3)] transition-all active:scale-95">
+                    Complete Assessment & Start Journey
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const motivationSlider = document.querySelector('input[name="motivation_level"]');
+    const motivationValue = document.getElementById('motivation-value');
+    
+    if (motivationSlider) {
+        motivationSlider.addEventListener('input', function() {
+            motivationValue.textContent = this.value;
+        });
+    }
+});
+</script>
+{% endblock %}

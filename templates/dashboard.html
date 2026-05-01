@@ -1,0 +1,579 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+        background-attachment: fixed;
+    }
+
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.55);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    }
+
+    .metric-card {
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 24px 48px rgba(15, 23, 42, 0.12);
+    }
+
+    .reveal-up {
+        animation: reveal-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes reveal-up {
+        from {
+            opacity: 0;
+            transform: translateY(24px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .danger-glow {
+        border-color: rgba(239, 68, 68, 0.45);
+        box-shadow: 0 14px 30px rgba(239, 68, 68, 0.16);
+    }
+
+    .hydration-card {
+        position: relative;
+        overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.9);
+        box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.5), 0 8px 32px rgba(31, 38, 135, 0.1);
+    }
+
+    .hydration-fill {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(180deg, rgba(56, 189, 248, 0.45), rgba(37, 99, 235, 0.85));
+        transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 0;
+    }
+
+    .hydration-wave {
+        position: absolute;
+        top: -15px;
+        left: -50%;
+        width: 200%;
+        height: 35px;
+        background: rgba(255, 255, 255, 0.4);
+        border-radius: 40%;
+        animation: wave 3.5s linear infinite;
+    }
+
+    .hydration-wave:nth-child(2) {
+        top: -20px;
+        background: rgba(255, 255, 255, 0.2);
+        animation: wave 4s linear infinite;
+        animation-delay: -1.5s;
+    }
+
+    .trigger-wave {
+        position: absolute;
+        bottom: 0;
+        left: -50%;
+        width: 200%;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        opacity: 0;
+        animation: none;
+    }
+
+    .wave-active .trigger-wave {
+        animation: wave-trigger 1.5s ease-out;
+    }
+
+    @keyframes wave-trigger {
+        0% {
+            opacity: 1;
+            transform: translateX(0) scale(0.5);
+        }
+
+        50% {
+            opacity: 0.8;
+            transform: translateX(-25%) scale(1);
+        }
+
+        100% {
+            opacity: 0;
+            transform: translateX(-50%) scale(0.5);
+        }
+    }
+
+    .hydration-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    @keyframes wave {
+        0% {
+            transform: translateX(0) rotate(0deg);
+        }
+
+        50% {
+            transform: translateX(-25%) rotate(180deg);
+        }
+
+        100% {
+            transform: translateX(-50%) rotate(360deg);
+        }
+    }
+
+    .ai-content-area h2,
+    .ai-content-area h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0.8rem 0 0.4rem;
+    }
+
+    .ai-content-area p,
+    .ai-content-area li {
+        color: #334155;
+        line-height: 1.6;
+        font-size: 0.9rem;
+    }
+
+    .ai-section {
+        position: relative;
+        background: linear-gradient(135deg, rgba(30, 144, 255, 0.05), rgba(147, 112, 219, 0.05));
+        border: 2px solid rgba(59, 130, 246, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .ai-section:hover {
+        border-color: rgba(59, 130, 246, 0.4);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .ai-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .ai-loading {
+        background: linear-gradient(90deg, #f3f4f6, #e5e7eb, #f3f4f6);
+        background-size: 200% 100%;
+        animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+        0% {
+            background-position: 200% 0;
+        }
+
+        100% {
+            background-position: -200% 0;
+        }
+    }
+</style>
+
+<section class="space-y-6">
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div class="glass-panel rounded-2xl px-5 py-3 flex items-center gap-4">
+            <button onclick="changeDay(-1)" class="text-slate-600 hover:text-emerald-600 text-xl font-bold">←</button>
+            <div class="text-center min-w-[180px]">
+                <p class="text-sm font-semibold text-slate-900" id="currentDateDisplay">{{ log.date.strftime('%B %d,
+                    %Y') }}</p>
+                <p class="text-[11px] text-slate-500 uppercase tracking-wider">Daily Health Snapshot</p>
+            </div>
+            <button onclick="changeDay(1)" class="text-slate-600 hover:text-emerald-600 text-xl font-bold">→</button>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ url_for('connect_google_fit') }}"
+                class="glass-panel rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-white">
+                Sync Google Fit
+            </a>
+            <a href="{{ url_for('reports') }}"
+                class="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700">
+                Full Report
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-5 lg:grid-cols-4 reveal-up" style="animation-delay:.03s">
+        <div class="glass-panel metric-card rounded-3xl p-6 lg:col-span-1">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Daily Health Score</p>
+            <div class="mt-4 flex items-end gap-2">
+                <span class="text-4xl font-extrabold text-slate-900">{{ log.health_score }}</span>
+                <span class="pb-1 text-sm text-slate-500">/ 100</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Goal: <span class="font-semibold">{{ user.goal or 'General Fitness'
+                    }}</span></p>
+        </div>
+
+        <div id="metabolismCard"
+            class="glass-panel metric-card rounded-3xl p-6 lg:col-span-2 {% if daily_target > 0 and log.calories_consumed > daily_target %}danger-glow{% endif %}">
+            <div class="flex items-end justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Dynamic Metabolism</p>
+                    <p class="mt-1 text-sm text-slate-600">Adaptive target: {{ daily_target }} kcal</p>
+                </div>
+                <p class="text-3xl font-extrabold text-slate-900">
+                    <span id="calConsumed"
+                        class="{% if daily_target > 0 and log.calories_consumed > daily_target %}text-red-600{% endif %}">{{
+                        log.calories_consumed }}</span>
+                    <span class="text-base font-medium text-slate-500">/ {{ daily_target }}</span>
+                </p>
+            </div>
+            <div class="mt-5 h-3 w-full overflow-hidden rounded-full bg-slate-200">
+                <div id="calProgressBar" data-pct="{{ cal_percentage }}" data-target="{{ daily_target }}"
+                    class="h-full rounded-full bg-gradient-to-r {% if daily_target > 0 and log.calories_consumed > daily_target %}from-red-500 to-rose-600{% else %}from-emerald-500 to-cyan-500{% endif %}">
+                </div>
+            </div>
+            <p id="calorieStatus"
+                class="mt-3 text-sm font-semibold {% if daily_target > 0 and log.calories_consumed > daily_target %}text-red-600{% else %}text-emerald-700{% endif %}">
+                {% if daily_target > 0 and log.calories_consumed > daily_target %}
+                Over target by {{ log.calories_consumed - daily_target }} kcal
+                {% else %}
+                Within today's recommended calorie range
+                {% endif %}
+            </p>
+            <div class="mt-4 flex gap-2">
+                <button onclick="trackMetric('calories', 100)"
+                    class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">+100
+                    kcal</button>
+                <button onclick="trackMetric('calories', 250)"
+                    class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">+250
+                    kcal</button>
+                <label
+                    class="cursor-pointer rounded-lg border border-dashed border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+                    Add Meal Photo
+                    <input type="file" id="mealPhoto" class="hidden" accept="image/*" onchange="uploadMealPhoto()">
+                </label>
+            </div>
+        </div>
+
+        <div
+            class="glass-panel metric-card hydration-card rounded-3xl p-6 lg:col-span-1 min-h-[220px] flex flex-col justify-between">
+            <div id="waterFill" data-pct="{{ water_goal_pct }}" class="hydration-fill">
+                <div class="hydration-wave"></div>
+                <div class="hydration-wave"></div>
+                <div class="trigger-wave"></div>
+            </div>
+            <div class="hydration-content">
+                <p class="text-xs font-bold uppercase tracking-wider text-slate-800 drop-shadow-sm">Water Hydration</p>
+                <p class="mt-3 text-4xl font-extrabold text-slate-900 drop-shadow-md">
+                    <span id="waterValText">{{ log.water_intake }}</span>
+                    <span class="text-base font-medium text-slate-800">/ 8</span>
+                </p>
+                <p class="mt-1 text-sm text-slate-800 font-medium drop-shadow-sm"><span id="waterPctText">{{
+                        water_goal_pct }}</span>% of daily goal</p>
+            </div>
+            <div class="hydration-content mt-4 flex justify-end">
+                <button onclick="trackMetric('water', 1)"
+                    class="flex h-12 w-12 items-center justify-center rounded-full bg-white bg-opacity-80 text-2xl font-bold text-cyan-600 shadow-xl backdrop-blur-md transition hover:scale-110 hover:bg-white border border-cyan-100 pb-1">+</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 reveal-up" style="animation-delay:.11s">
+        <div class="glass-panel ai-section rounded-2xl p-5">
+            <p class="text-xs uppercase tracking-wider text-slate-600 font-semibold mb-2">⚡ Smart Tips</p>
+            <p class="text-sm text-slate-700 leading-relaxed">Personalized nutrition tips appear here based on your
+                daily activity.</p>
+        </div>
+        <div class="glass-panel ai-section rounded-2xl p-5">
+            <p class="text-xs uppercase tracking-wider text-slate-600 font-semibold mb-2">🎯 Daily Focus</p>
+            <p class="text-sm text-slate-700 leading-relaxed">Focus on your top health goal for maximum progress this
+                week.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-3 reveal-up" style="animation-delay:.13s">
+        <div class="glass-panel rounded-3xl p-6 xl:col-span-2">
+            <div class="mb-4 flex items-center justify-between">
+                <h3 class="text-lg font-bold text-slate-900">Biometric Trend</h3>
+                <div class="text-xs text-slate-500">Steps vs Calories</div>
+            </div>
+            <div class="h-72" id="chart-container" data-labels='{{ chart_labels | tojson | safe }}'
+                data-steps='{{ chart_steps | tojson | safe }}' data-calories='{{ chart_calories | tojson | safe }}'>
+                <canvas id="correlationChart"></canvas>
+            </div>
+        </div>
+
+        <div class="glass-panel ai-section rounded-3xl p-6">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-bold text-slate-900">🧑‍🍳 How To Cook</h3>
+                <span class="ai-badge">AI Chef</span>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">Get professional cooking instructions for any dish</p>
+            <div class="mt-3 flex gap-2">
+                <input id="cookDishInput" type="text" placeholder="e.g., grilled paneer"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <button onclick="generateCookGuide()"
+                    class="rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:from-emerald-600 hover:to-emerald-700 transition hover:scale-105">Go</button>
+            </div>
+            <div id="cookGuideResult"
+                class="ai-content-area mt-4 max-h-72 overflow-y-auto rounded-xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-3 text-sm text-slate-700">
+                ✨ Ask for any meal and get complete cooking instructions.
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-3 reveal-up" style="animation-delay:.17s">
+        <div class="glass-panel ai-section rounded-3xl p-6 xl:col-span-2">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-bold text-slate-900">🧠 AI Recommendations</h3>
+                <span class="ai-badge">Personalized Plan</span>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">Your customized meal plan powered by AI nutrition science</p>
+            <div
+                class="ai-content-area mt-4 max-h-[420px] overflow-y-auto rounded-xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-4">
+                {{ user.meal_plan | safe }}
+            </div>
+        </div>
+
+        <div class="glass-panel ai-section rounded-3xl p-6">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-bold text-slate-900">📊 Health Prediction</h3>
+                <button onclick="fetchPredictions()"
+                    class="rounded-lg border border-emerald-300 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 transition hover:scale-105">🔄
+                    Refresh</button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">30-day forecast based on your trends</p>
+            <div id="predictionArea"
+                class="ai-content-area mt-4 max-h-[420px] overflow-y-auto rounded-xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-4">
+                {% if user.health_predictions %}
+                {{ user.health_predictions | safe }}
+                {% else %}
+                <div class="text-center py-8">
+                    <p class="text-slate-500 text-sm">📈 Not enough data yet for prediction.</p>
+                    <p class="text-slate-400 text-xs mt-2">Keep logging daily metrics to unlock AI predictions!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="mealAnalysisOverlay"
+    class="hidden fixed bottom-6 left-1/2 z-50 w-[min(680px,92vw)] -translate-x-1/2 rounded-2xl border border-emerald-200 bg-white/95 p-5 shadow-xl">
+    <div class="flex items-start justify-between gap-4">
+        <div>
+            <p class="text-xs uppercase tracking-wider text-slate-500">AI Meal Analysis</p>
+            <h4 id="detectedMealName" class="text-xl font-bold text-slate-900">Analyzing...</h4>
+            <p id="detectedNutrition" class="text-sm text-slate-600">P: -- | C: -- | F: --</p>
+            <p class="mt-2 text-sm text-slate-700">Calories added: <span id="detectedCalories"
+                    class="font-semibold">0</span></p>
+        </div>
+        <button onclick="hideMealOverlay()"
+            class="rounded-lg border border-slate-300 px-2 py-1 text-slate-600 hover:bg-slate-50">Close</button>
+    </div>
+</div>
+
+<div class="fixed bottom-8 right-8 z-40">
+    <a href="{{ url_for('chat') }}"
+        class="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-600 text-2xl text-white shadow-lg transition hover:scale-105 hover:bg-emerald-700">💬</a>
+</div>
+
+<script>
+    function getWaterPct(glasses) {
+        return Math.min(100, Math.max(0, Math.round((glasses / 8) * 100)));
+    }
+
+    function updateCaloriesUI(calories) {
+        const calConsumed = document.getElementById('calConsumed');
+        const progressBar = document.getElementById('calProgressBar');
+        const metabolismCard = document.getElementById('metabolismCard');
+        const status = document.getElementById('calorieStatus');
+        calConsumed.innerText = calories;
+        const target = parseInt(progressBar.dataset.target || '0', 10);
+        const pct = target > 0 ? Math.min(100, Math.round((calories / target) * 100)) : 0;
+        progressBar.style.width = pct + '%';
+
+        if (target > 0 && calories > target) {
+            const over = calories - target;
+            calConsumed.classList.add('text-red-600');
+            metabolismCard.classList.add('danger-glow');
+            progressBar.classList.remove('from-emerald-500', 'to-cyan-500');
+            progressBar.classList.add('from-red-500', 'to-rose-600');
+            status.classList.remove('text-emerald-700');
+            status.classList.add('text-red-600');
+            status.innerText = `Over target by ${over} kcal`;
+        } else {
+            calConsumed.classList.remove('text-red-600');
+            metabolismCard.classList.remove('danger-glow');
+            progressBar.classList.remove('from-red-500', 'to-rose-600');
+            progressBar.classList.add('from-emerald-500', 'to-cyan-500');
+            status.classList.remove('text-red-600');
+            status.classList.add('text-emerald-700');
+            status.innerText = "Within today's recommended calorie range";
+        }
+    }
+
+    function triggerWaveAnimation() {
+        const waterFill = document.getElementById('waterFill');
+        if (!waterFill) return;
+
+        // Add wave animation class
+        waterFill.classList.add('wave-active');
+
+        // Remove class after animation completes
+        setTimeout(() => {
+            waterFill.classList.remove('wave-active');
+        }, 1500);
+    }
+
+    async function trackMetric(field, value) {
+        const response = await fetch('/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ field, value })
+        });
+        const data = await response.json();
+        if (!data.success) return;
+
+        if (field === 'water') {
+            const pct = getWaterPct(data.water);
+            document.getElementById('waterFill').style.height = pct + '%';
+            document.getElementById('waterValText').innerText = data.water;
+            document.getElementById('waterPctText').innerText = pct;
+            triggerWaveAnimation();
+        } else if (field === 'calories') {
+            updateCaloriesUI(data.calories);
+        } else {
+            location.reload();
+        }
+    }
+
+    async function uploadMealPhoto() {
+        const input = document.getElementById('mealPhoto');
+        if (!input.files[0]) return;
+        const overlay = document.getElementById('mealAnalysisOverlay');
+        const nameEl = document.getElementById('detectedMealName');
+        const nutEl = document.getElementById('detectedNutrition');
+        const calEl = document.getElementById('detectedCalories');
+
+        overlay.classList.remove('hidden');
+        nameEl.innerText = "Analyzing photo...";
+        nutEl.innerText = "AI nutrition scan in progress...";
+
+        const formData = new FormData();
+        formData.append('photo', input.files[0]);
+        try {
+            const resp = await fetch('/add_meal', { method: 'POST', body: formData });
+            const data = await resp.json();
+            if (data.success) {
+                nameEl.innerText = data.meal.name;
+                nutEl.innerText = data.meal.nutrition;
+                calEl.innerText = data.meal.calories;
+                updateCaloriesUI(data.total_calories);
+            } else {
+                nameEl.innerText = "Analysis failed";
+                nutEl.innerText = data.error || "Could not detect this meal.";
+            }
+        } catch (e) {
+            nameEl.innerText = "Network error";
+            nutEl.innerText = "Please try again.";
+        }
+    }
+
+    function hideMealOverlay() {
+        document.getElementById('mealAnalysisOverlay').classList.add('hidden');
+    }
+
+    function changeDay(offset) {
+        const currentUrl = new URL(window.location.href);
+        const dateParam = currentUrl.searchParams.get('date');
+        let date = dateParam ? new Date(dateParam) : new Date();
+        date.setDate(date.getDate() + offset);
+        window.location.href = `/dashboard?date=${date.toISOString().split('T')[0]}`;
+    }
+
+    async function fetchPredictions() {
+        const target = document.getElementById('predictionArea');
+        target.innerHTML = '<p class="text-slate-500">Generating prediction...</p>';
+        const resp = await fetch('/get_predictions');
+        const data = await resp.json();
+        target.innerHTML = data.html;
+    }
+
+    async function generateCookGuide() {
+        const dishInput = document.getElementById('cookDishInput');
+        const result = document.getElementById('cookGuideResult');
+        const dish = dishInput.value.trim();
+        if (!dish) {
+            result.innerHTML = '<p class="text-red-500">Enter a dish name first.</p>';
+            return;
+        }
+        result.innerHTML = '<p class="text-slate-500">Generating cooking guide...</p>';
+        try {
+            const resp = await fetch('/how_to_cook', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dish })
+            });
+            const data = await resp.json();
+            result.innerHTML = data.success ? data.html : `<p class="text-red-500">${data.error || 'Unable to generate guide.'}</p>`;
+        } catch (error) {
+            result.innerHTML = '<p class="text-red-500">Network error while generating guide.</p>';
+        }
+    }
+
+    // Removed startVoiceWater as per user request
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const calProgress = document.getElementById('calProgressBar');
+        if (calProgress) {
+            const initialCalPct = parseInt(calProgress.dataset.pct || '0', 10);
+            calProgress.style.width = initialCalPct + '%';
+        }
+        const waterFill = document.getElementById('waterFill');
+        if (waterFill) {
+            const initialWaterPct = parseInt(waterFill.dataset.pct || '0', 10);
+            waterFill.style.height = initialWaterPct + '%';
+        }
+
+        const container = document.getElementById('chart-container');
+        if (!container) return;
+        const labels = JSON.parse(container.dataset.labels);
+        const steps = JSON.parse(container.dataset.steps);
+        const calories = JSON.parse(container.dataset.calories);
+
+        new Chart(document.getElementById('correlationChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Steps', data: steps, borderColor: '#0ea5e9', borderWidth: 3, tension: 0.35, fill: true, backgroundColor: 'rgba(14, 165, 233, 0.08)' },
+                    { label: 'Calories', data: calories, borderColor: '#10b981', borderWidth: 3, tension: 0.35, fill: true, backgroundColor: 'rgba(16, 185, 129, 0.08)' }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(148,163,184,0.2)' } },
+                    x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(148,163,184,0.15)' } }
+                },
+                plugins: {
+                    legend: { labels: { color: '#334155' } },
+                    tooltip: { backgroundColor: '#0f172a', titleColor: '#f8fafc', bodyColor: '#e2e8f0' }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

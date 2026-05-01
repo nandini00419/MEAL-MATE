@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="p-6">
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-black text-slate-900 mb-2">👨‍🍳 AI Cook Chatbot</h1>
+            <p class="text-slate-500">Get personalized cooking advice and YouTube recipe suggestions</p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+            <button onclick="quickMessage('How to cook chicken breast?')" 
+                    class="glass-card border border-slate-200 rounded-xl p-4 hover:border-purple-500/50 transition-all text-slate-900 font-bold text-sm text-left">
+                🍗 How to Cook Chicken
+            </button>
+            <button onclick="quickMessage('Give me a quick breakfast recipe')" 
+                    class="glass-card border border-slate-200 rounded-xl p-4 hover:border-purple-500/50 transition-all text-slate-900 font-bold text-sm text-left">
+                🥞 Quick Breakfast
+            </button>
+            <button onclick="quickMessage('What are healthy snack ideas?')" 
+                    class="glass-card border border-slate-200 rounded-xl p-4 hover:border-purple-500/50 transition-all text-slate-900 font-bold text-sm text-left">
+                🥗 Healthy Snacks
+            </button>
+            <button onclick="quickMessage('Show me meal prep ideas for the week')" 
+                    class="glass-card border border-slate-200 rounded-xl p-4 hover:border-purple-500/50 transition-all text-slate-900 font-bold text-sm text-left">
+                📦 Meal Prep
+            </button>
+        </div>
+
+        <!-- Recipe Suggestion Section -->
+        <div class="glass-card border border-slate-200 rounded-2xl p-6 mb-8">
+            <h2 class="text-xl font-black text-slate-900 mb-4">🎁 Quick Recipe Suggestion</h2>
+            <div class="flex gap-3">
+                <select id="dietaryNeed" class="flex-1 px-6 py-4 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-purple-500 transition-all outline-none">
+                    <option>Healthy</option>
+                    <option>Quick & Easy</option>
+                    <option>Protein-Rich</option>
+                    <option>Low-Carb</option>
+                    <option>Vegetarian</option>
+                    <option>Budget-Friendly</option>
+                </select>
+                <button onclick="getRecipeSuggestion()" 
+                        class="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl font-black text-xs uppercase tracking-widest text-white hover:shadow-[0_10px_30px_rgba(147,51,234,0.2)] transition-all active:scale-95">
+                    Get Recipe
+                </button>
+            </div>
+            <div id="recipeSuggestionBox" class="mt-4"></div>
+        </div>
+
+        <!-- Chat Interface -->
+        <div class="glass-card border border-slate-200 rounded-2xl overflow-hidden">
+            
+            <!-- Chat Messages Area -->
+            <div id="chatMessages" class="h-[500px] overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-transparent to-slate-50">
+                <div class="bg-slate-100 rounded-lg p-4">
+                    <p class="text-slate-600 text-sm">👨‍🍳 <strong>Cook AI:</strong> Hey there! I'm your personal cooking assistant. Ask me about recipes, cooking techniques, or how to make specific dishes. I'll also suggest YouTube cooking channels and videos to help you learn!</p>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="border-t border-slate-200 p-6 bg-slate-50">
+                <div class="flex gap-3">
+                    <input type="text" id="chatInput" placeholder="Ask me about cooking, recipes, YouTube videos..."
+                           onkeypress="handleKeyPress(event)"
+                           class="flex-1 px-6 py-4 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-purple-500 transition-all outline-none placeholder-slate-400">
+                    <button onclick="sendMessage()" 
+                            class="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl font-black text-xs uppercase tracking-widest text-white hover:shadow-[0_10px_30px_rgba(147,51,234,0.2)] transition-all active:scale-95">
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="mt-8 glass-card border border-slate-200 rounded-2xl p-6 bg-gradient-to-br from-emerald-50 to-green-50">
+            <h3 class="text-lg font-bold text-slate-900 mb-4">💡 Cooking Tips</h3>
+            <ul class="text-slate-600 text-sm space-y-2">
+                <li>✓ Ask about cooking methods, ingredient substitutions, or recipe modifications</li>
+                <li>✓ Request YouTube channel recommendations for specific cuisines</li>
+                <li>✓ Ask for meal prep strategies and time-saving tips</li>
+                <li>✓ Get suggestions aligned with your health and fitness goals</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        // Add user message to chat
+        const messagesDiv = document.getElementById('chatMessages');
+        const userMsg = document.createElement('div');
+        userMsg.className = 'bg-purple-100 border border-purple-200 rounded-lg p-4 ml-8';
+        userMsg.innerHTML = `<p class="text-slate-700 text-sm"><strong>You:</strong> ${escapeHtml(message)}</p>`;
+        messagesDiv.appendChild(userMsg);
+        
+        // Clear input
+        input.value = '';
+        
+        // Show typing indicator
+        const typingDiv = document.createElement('div');
+        typingDiv.id = 'typingIndicator';
+        typingDiv.className = 'bg-slate-100 rounded-lg p-4';
+        typingDiv.innerHTML = `<p class="text-slate-500 text-sm">👨‍🍳 Chef is thinking<span class="animate-pulse">...</span></p>`;
+        messagesDiv.appendChild(typingDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        
+        // Send message to server
+        fetch('/cook_chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Remove typing indicator
+            document.getElementById('typingIndicator').remove();
+            
+            // Add AI response
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'bg-slate-100 rounded-lg p-4';
+            aiMsg.innerHTML = `<p class="text-slate-700 text-sm"><strong>👨‍🍳 Cook AI:</strong></p><p class="text-slate-600 text-sm mt-2">${data.reply}</p>`;
+            messagesDiv.appendChild(aiMsg);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('typingIndicator').remove();
+        });
+    }
+
+    function quickMessage(message) {
+        document.getElementById('chatInput').value = message;
+        sendMessage();
+    }
+
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    function getRecipeSuggestion() {
+        const dietaryNeed = document.getElementById('dietaryNeed').value;
+        const box = document.getElementById('recipeSuggestionBox');
+        
+        box.innerHTML = '<p class="text-gray-400 text-sm">🔄 Getting recipe suggestion...</p>';
+        
+        fetch('/recipe_suggestion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ dietary_need: dietaryNeed })
+        })
+        .then(response => response.json())
+        .then(data => {
+            box.innerHTML = data.recipe;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            box.innerHTML = '<p class="text-red-400 text-sm">Error fetching recipe. Try again!</p>';
+        });
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+</script>
+{% endblock %}
